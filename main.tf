@@ -10,7 +10,7 @@ resource "aws_instance" "ubuntu-server" {
   }
 }
 resource "aws_vpc" "prod-vpc" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block = "10.0.1.0/24"
   tags = {
     Name = "Production"
   }
@@ -31,4 +31,12 @@ resource "aws_route_table" "prod-route-table" {
   tags = {
     Name = "Prod"
   }
+}
+resource "aws_subnet" "subnet-1" {
+    vpc_id = aws_vpc.prod-vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1b"
+    tags = {
+      Name = "prod-subnet"
+    }
 }
