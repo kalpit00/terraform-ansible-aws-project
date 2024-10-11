@@ -9,3 +9,9 @@ resource "aws_instance" "ubuntu-server" {
     Name = "Ubuntu Server"
   }
 }
+resource "aws_vpc" "prod-vpc" {
+  cidr_block       = "10.0.0.0/16"
+  tags = {
+    Name = "Production"
+  }
+}
