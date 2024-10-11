@@ -8,6 +8,19 @@ resource "aws_instance" "ubuntu-server" {
   tags = {
     Name = "Ubuntu Server"
   }
+  availability_zone = "ap-south-1b"
+  key_name = "main-key"
+  network_interface {
+    device_index = 0
+    network_interface_id = aws_network_interface.web-server-nic.id
+  }
+  user_data = <<-EOF
+            #!/bin/bash
+            sudo apt update -y
+            sudo apt install apache2 -y
+            sudo systemctl start apache2
+            sudo bash -c 'echo HelloWorld > /var/www/html/index.html'
+            EOF      
 }
 resource "aws_vpc" "prod-vpc" {
   cidr_block = "10.0.1.0/24"
@@ -95,4 +108,5 @@ resource "aws_eip" "one" {
   domain                    = "vpc"
   network_interface         = aws_network_interface.web-server-nic.id
   associate_with_private_ip = "10.0.1.50"
+  depends_on = [ aws_internet_gateway.gw ]
 }
