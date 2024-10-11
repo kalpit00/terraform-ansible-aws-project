@@ -8,11 +8,14 @@ https://console.aws.amazon.com/
 Go to Security Credentials and create an [Access Key, Secret Key] Pair. Don't hard code this as it can raise security concerns, best practice is to type this in a .env file to use in your project, or EXPORT directly to your terminal's seesion as an env variable
 
 For just the sake of testing in local machine, you can add these 3 params to the Provider block and hard code
+```
 provider "aws" {
   region     = "us-west-2"
   access_key = "my-access-key"
   secret_key = "my-secret-key"
 }
+```
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs
 You can delete the access key after testing
 
 First step is to Run `terraform init`
