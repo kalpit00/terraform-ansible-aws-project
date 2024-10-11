@@ -23,12 +23,15 @@ resource "aws_instance" "ubuntu-server" {
             EOF      
 }
 resource "aws_vpc" "prod-vpc" {
-  cidr_block = "10.0.1.0/24"
+  cidr_block = "10.0.0.0/16"
   tags = {
     Name = "Production"
   }
 }
 resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.prod-vpc.id
+}
+resource "aws_egress_only_internet_gateway" "egw" {
   vpc_id = aws_vpc.prod-vpc.id
 }
 resource "aws_route_table" "prod-route-table" {
@@ -39,7 +42,7 @@ resource "aws_route_table" "prod-route-table" {
   }
   route {
     ipv6_cidr_block        = "::/0"
-    gateway_id = aws_internet_gateway.gw.id
+    egress_only_gateway_id = aws_egress_only_internet_gateway.egw.id
   }
   tags = {
     Name = "Prod"
@@ -57,52 +60,34 @@ resource "aws_route_table_association" "a" {
   subnet_id = aws_subnet.subnet-1.id
   route_table_id = aws_route_table.prod-route-table.id
 }
+
 resource "aws_security_group" "allow_web" {
   name = "allow_web_traffic"
   description = "allow web traffic"
   vpc_id = aws_vpc.prod-vpc.id
-  ingress = {
-    description = "SSH traffic"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress = {
-    from_port = 0
-    to_port = 0
-    protocol = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
   tags = {
     Name = "allow web"
   }
 }
-resource "aws_security_group" "allow_web2" {
-  name = "allow_web_traffic"
-  description = "allow web traffic"
-  vpc_id = aws_vpc.prod-vpc.id
-  ingress = {
-    description = "HTTP traffic"
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress = {
-    from_port = 0
-    to_port = 0
-    protocol = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = {
-    Name = "allow web"
-  }
+resource "aws_vpc_security_group_ingress_rule" "allow_web" {
+  security_group_id = aws_security_group.allow_web.id
+  cidr_ipv4   = "0.0.0.0/0"
+  from_port   = 22
+  ip_protocol = "tcp"
+  to_port     = 22
+}
+resource "aws_vpc_security_group_egress_rule" "allow_web" {
+  security_group_id = aws_security_group.allow_web.id
+  cidr_ipv4   = "0.0.0.0/0"
+  from_port   = 0
+  ip_protocol = "tcp"
+  to_port     = 0
 }
 resource "aws_network_interface" "web-server-nic" {
   subnet_id = aws_subnet.subnet-1.id
   private_ips     = ["10.0.1.50"]
-  security_groups = [aws_security_group.allow_web.id, aws_security_group.allow_web2]
+  security_groups = [aws_security_group.allow_web.id]
 }
 resource "aws_eip" "one" {
   domain                    = "vpc"
