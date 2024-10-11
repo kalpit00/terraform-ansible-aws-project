@@ -91,3 +91,8 @@ resource "aws_network_interface" "web-server-nic" {
   private_ips     = ["10.0.1.50"]
   security_groups = [aws_security_group.allow_web.id, aws_security_group.allow_web2]
 }
+resource "aws_eip" "one" {
+  domain                    = "vpc"
+  network_interface         = aws_network_interface.web-server-nic.id
+  associate_with_private_ip = "10.0.1.50"
+}
