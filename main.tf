@@ -65,3 +65,29 @@ resource "aws_security_group" "allow_web" {
     Name = "allow web"
   }
 }
+resource "aws_security_group" "allow_web2" {
+  name = "allow_web_traffic"
+  description = "allow web traffic"
+  vpc_id = aws_vpc.prod-vpc.id
+  ingress = {
+    description = "HTTP traffic"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress = {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "allow web"
+  }
+}
+resource "aws_network_interface" "web-server-nic" {
+  subnet_id = aws_subnet.subnet-1.id
+  private_ips     = ["10.0.1.50"]
+  security_groups = [aws_security_group.allow_web.id, aws_security_group.allow_web2]
+}
