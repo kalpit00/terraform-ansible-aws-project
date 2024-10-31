@@ -1,4 +1,4 @@
-Sample Project to use Terraform to learn Infrastructure as Code (IaC)
+Sample Project to use Terraform and Ansible to learn Infrastructure as Code (IaC)
 
 To try this web server, you will need your own AWS account and ACCESS keys
 
@@ -30,3 +30,14 @@ Find the ip address where this web server is hosted, and you can open it in brow
 I have installed `apache2` in a virtual `Ubuntu Server` using aws. A simple bash script echos the text to the index/html page, which gets shown as content on the webpage
 
 Finally, try different Terraform commands to learn more about how Terraform can help in Automating Infrastructure Provisioning
+
+
+EDIT :
+
+Later on, Added Ansible for Configuration Management and Dynamic Inventory Loading
+
+I provisioned extra EC2 Instances using Ansible (on top of the one provisioned earlier by Terraform, same Linux AMI)
+
+The Power of Ansible is that using a Master Node where Ansible playbooks were ran, simultaneosly all the Ubuntu servers responded to the configuration
+
+Installed Apache using Yum package manager on all servers and hosted a HTTP Webpage on all of them
