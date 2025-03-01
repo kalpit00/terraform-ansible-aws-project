@@ -1,43 +1,81 @@
-Sample Project to use Terraform and Ansible to learn Infrastructure as Code (IaC)
+# Infrastructure as Code (IaC) Project with Terraform & Ansible  
 
-To try this web server, you will need your own AWS account and ACCESS keys
+This project demonstrates how to use **Terraform** and **Ansible** to automate infrastructure provisioning and configuration management on **AWS**.  
 
-Create an account and login
-https://console.aws.amazon.com/
+## Prerequisites  
 
-Go to Security Credentials and create an [Access Key, Secret Key] Pair. Don't hard code this as it can raise security concerns, best practice is to type this in a .env file to use in your project, or EXPORT directly to your terminal's seesion as an env variable
+To try this web server, you need:  
+- An **AWS account**  
+- AWS **Access Key** and **Secret Key**  
 
-For just the sake of testing in local machine, you can add these 3 params to the Provider block and hard code
+### Set Up AWS Credentials  
+1. **Create an AWS Account** and log in at [AWS Console](https://console.aws.amazon.com/).  
+2. Navigate to **Security Credentials** → **Access Keys** and generate a new key pair.  
+3. **Best Practice:** Avoid hardcoding credentials. Instead, store them in a `.env` file or export them as environment variables:  
+   ```sh
+   export AWS_ACCESS_KEY_ID="your-access-key"
+   export AWS_SECRET_ACCESS_KEY="your-secret-key"
+   ```
+4. **Temporary Setup for Local Testing (Not Recommended in Production)**  
+   You can hardcode the credentials in the Terraform provider block:  
+   ```hcl
+   provider "aws" {
+     region     = "us-west-2"
+     access_key = "my-access-key"
+     secret_key = "my-secret-key"
+   }
+   ```
+   More details: [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)  
+
+5. **After testing**, delete your access key for security reasons.  
+
+---
+
+## Step 1: Initialize Terraform  
+Run:  
+```sh
+terraform init
 ```
-provider "aws" {
-  region     = "us-west-2"
-  access_key = "my-access-key"
-  secret_key = "my-secret-key"
-}
+This command:  
+- Initializes the Terraform environment  
+- Downloads the necessary AWS provider plugins  
+
+## Step 2: Apply Terraform Configuration  
+Run:  
+```sh
+terraform apply
 ```
-https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-You can delete the access key after testing
+This will create the infrastructure, including:  
+✅ EC2 instance (Ubuntu Server)  
+✅ VPC  
+✅ Internet Gateway  
+✅ Route Tables  
+✅ Network Interfaces  
 
-First step is to Run `terraform init`
+You can verify the resources in your **AWS Console**.  
 
-This will initialize the terraform environment and locate `aws` as the Provider, install the aws plugins and api-related code to communicate with your aws account. Upon authentication with your account via the access key, you can run terraform commands
+## Step 3: Access the Web Server  
+1. Retrieve the **public IP address** of the provisioned EC2 instance.  
+2. Open a browser and navigate to `http://<EC2_PUBLIC_IP>`.  
+3. You should see a simple **"Hello, World!"** message.  
 
-Run `terraform apply` to create the infrastructure
-Head over to your aws console to see if you created the server instance, the vpc, internet gateway, routing tables, network interface, and the other resources that were declared in the `.tf` file
+The instance is preconfigured with **Apache** via a simple Bash script that updates the web server’s index page.  
 
-Find the ip address where this web server is hosted, and you can open it in browser to see a simple `Hello World` text being displayed
+---
 
-I have installed `apache2` in a virtual `Ubuntu Server` using aws. A simple bash script echos the text to the index/html page, which gets shown as content on the webpage
+## Step 4: Configuration Management with Ansible  
+Later, **Ansible** was integrated to:  
+- Provision additional **EC2 instances** on top of the one created by Terraform  
+- Perform **configuration management**  
+- Dynamically load inventory  
 
-Finally, try different Terraform commands to learn more about how Terraform can help in Automating Infrastructure Provisioning
+### How Ansible Works in This Project  
+- Ansible playbooks were executed from a **Master Node**.  
+- All provisioned **Ubuntu servers** responded to the configuration.  
+- Apache was installed on all instances using **Yum**.  
+- A basic HTTP webpage was deployed across all instances.  
 
+---
 
-EDIT :
-
-Later on, Added Ansible for Configuration Management and Dynamic Inventory Loading
-
-I provisioned extra EC2 Instances using Ansible (on top of the one provisioned earlier by Terraform, same Linux AMI)
-
-The Power of Ansible is that using a Master Node where Ansible playbooks were ran, simultaneosly all the Ubuntu servers responded to the configuration
-
-Installed Apache using Yum package manager on all servers and hosted a HTTP Webpage on all of them
+## Exploring Further  
+Try out different **Terraform** and **Ansible** commands to experiment with Infrastructure as Code (IaC) automation.  
